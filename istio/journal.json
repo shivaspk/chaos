@@ -1,0 +1,468 @@
+{
+  "chaoslib-version": "1.8.1",
+  "platform": "Linux-4.15.0-91-generic-x86_64-with-Ubuntu-18.04-bionic",
+  "node": "testmaster",
+  "experiment": {
+    "title": "Network latency does not impact our users",
+    "description": "Using Istio fault injection capability, let's explore how latency impacts a single user",
+    "configuration": {
+      "product_page_url": {
+        "type": "env",
+        "key": "PRODUCT_PAGE_SERVICE_BASE_URL"
+      }
+    },
+    "secrets": {
+      "istio": {
+        "KUBERNETES_CONTEXT": {
+          "type": "env",
+          "key": "KUBERNETES_CONTEXT"
+        }
+      }
+    },
+    "steady-state-hypothesis": {
+      "title": "Our service should respond under 1 second",
+      "probes": [
+        {
+          "type": "probe",
+          "name": "sign-in-as-jason",
+          "tolerance": 0,
+          "provider": {
+            "type": "process",
+            "path": "curl",
+            "arguments": "-v -X POST -d 'username=jason&passwd=' -c /tmp/cookie.txt --silent ${product_page_url}/login"
+          }
+        },
+        {
+          "type": "probe",
+          "name": "fetch-productpage-for-jason-in-due-time",
+          "tolerance": 0,
+          "provider": {
+            "type": "process",
+            "path": "curl",
+            "arguments": "-v --connect-timeout 1 --max-time 1 -b /tmp/cookie.txt --silent ${product_page_url}/productpage"
+          }
+        }
+      ]
+    },
+    "method": [
+      {
+        "type": "action",
+        "name": "inject-fault-for-jason-only",
+        "provider": {
+          "type": "python",
+          "module": "chaosistio.fault.actions",
+          "func": "add_delay_fault",
+          "secrets": [
+            "istio"
+          ],
+          "arguments": {
+            "virtual_service_name": "reviews",
+            "fixed_delay": "5s",
+            "percent": 100,
+            "routes": [
+              {
+                "destination": {
+                  "host": "reviews",
+                  "subset": "v2"
+                }
+              }
+            ]
+          }
+        },
+        "pauses": {
+          "after": 2
+        }
+      }
+    ],
+    "rollbacks": [
+      {
+        "type": "action",
+        "name": "remove-fault-for-jason-only",
+        "provider": {
+          "type": "python",
+          "module": "chaosistio.fault.actions",
+          "func": "remove_delay_fault",
+          "secrets": [
+            "istio"
+          ],
+          "arguments": {
+            "virtual_service_name": "reviews",
+            "routes": [
+              {
+                "destination": {
+                  "host": "reviews",
+                  "subset": "v2"
+                }
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "dry": false
+  },
+  "start": "2020-03-30T17:46:15.394504",
+  "status": "failed",
+  "deviated": true,
+  "steady_states": {
+    "before": {
+      "steady_state_met": true,
+      "probes": [
+        {
+          "activity": {
+            "type": "probe",
+            "name": "sign-in-as-jason",
+            "tolerance": 0,
+            "provider": {
+              "type": "process",
+              "path": "curl",
+              "arguments": "-v -X POST -d 'username=jason&passwd=' -c /tmp/cookie.txt --silent ${product_page_url}/login"
+            }
+          },
+          "output": {
+            "status": 0,
+            "stdout": "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n<title>Redirecting...</title>\n<h1>Redirecting...</h1>\n<p>You should be redirected automatically to target URL: <a href=\"\"></a>.  If not click the link.",
+            "stderr": "*   Trying 134.209.155.202...\n* TCP_NODELAY set\n* Connected to 134.209.155.202 (134.209.155.202) port 30906 (#0)\n> POST /login HTTP/1.1\r\n> Host: 134.209.155.202:30906\r\n> User-Agent: curl/7.58.0\r\n> Accept: */*\r\n> Content-Length: 22\r\n> Content-Type: application/x-www-form-urlencoded\r\n> \r\n} [22 bytes data]\n* upload completely sent off: 22 out of 22 bytes\n< HTTP/1.1 302 Found\r\n< content-type: text/html; charset=utf-8\r\n< content-length: 207\r\n< location: http://134.209.155.202:30906/None\r\n< vary: Cookie\r\n* cookie size: name/val 7 + 57 bytes\n* cookie size: name/val 8 + 0 bytes\n* cookie size: name/val 4 + 1 bytes\n* Added cookie session=\"eyJ1c2VyIjoiamFzb24ifQ.XoIwZw.q7hCANguKLohEpkdWlPHnO_mYPs\" for domain 134.209.155.202, path /, expire 0\n< set-cookie: session=eyJ1c2VyIjoiamFzb24ifQ.XoIwZw.q7hCANguKLohEpkdWlPHnO_mYPs; HttpOnly; Path=/\r\n< server: istio-envoy\r\n< date: Mon, 30 Mar 2020 17:46:14 GMT\r\n< x-envoy-upstream-service-time: 3\r\n< \r\n{ [207 bytes data]\n* Connection #0 to host 134.209.155.202 left intact\n"
+          },
+          "status": "succeeded",
+          "start": "2020-03-30T17:46:15.395056",
+          "end": "2020-03-30T17:46:15.470522",
+          "duration": 0.075466,
+          "tolerance_met": true
+        },
+        {
+          "activity": {
+            "type": "probe",
+            "name": "fetch-productpage-for-jason-in-due-time",
+            "tolerance": 0,
+            "provider": {
+              "type": "process",
+              "path": "curl",
+              "arguments": "-v --connect-timeout 1 --max-time 1 -b /tmp/cookie.txt --silent ${product_page_url}/productpage"
+            }
+          },
+          "output": {
+            "status": 0,
+            "stdout": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Simple Bookstore App</title>\n<meta charset=\"utf-8\">\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\n<!-- Latest compiled and minified CSS -->\n<link rel=\"stylesheet\" href=\"static/bootstrap/css/bootstrap.min.css\">\n\n<!-- Optional theme -->\n<link rel=\"stylesheet\" href=\"static/bootstrap/css/bootstrap-theme.min.css\">\n\n  </head>\n  <body>\n    \n    \n\n<nav class=\"navbar navbar-inverse navbar-static-top\">\n  <div class=\"container\">\n    <div class=\"navbar-header\">\n      <a class=\"navbar-brand\" href=\"#\">BookInfo Sample</a>\n    </div>\n    \n    <p class=\"navbar-text navbar-right\">\n      <i class=\"glyphicon glyphicon-user\" aria-hidden=\"true\"></i>\n      <span style=\"padding-left: 5px;\">jason ( <a href=\"logout\">sign out</a> )</span>\n    </p>\n    \n  </div>\n</nav>\n\n<!---\n<div class=\"navbar navbar-inverse navbar-fixed-top\">\n  <div class=\"container\">\n    <div class=\"navbar-header pull-left\">\n      <a class=\"navbar-brand\" href=\"#\">Microservices Fabric BookInfo Demo</a>\n    </div>\n    <div class=\"navbar-header pull-right\">\n      <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\">\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n      </button>\n    </div>\n    <div class=\"navbar-collapse collapse\">\n\n      <a href=\"logout\"><button type=\"button\" class=\"btn btn-default navbar-btn pull-right\">Sign out</button></a>\n      <p class=\"navbar-text pull-right\">Signed in as jason</p>\n\n    </div>\n  </div>\n</div>\n-->\n\n<div id=\"login-modal\" class=\"modal fade\" role=\"dialog\">\n  <div class=\"modal-dialog\">\n    <div class=\"modal-content\">\n      <div class=\"modal-header\">\n        <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\n        <h4 class=\"modal-title\">Please sign in</h4>\n      </div>\n      <div class=\"modal-body\">\n        <form method=\"post\" action='login' name=\"login_form\">\n          <p><input type=\"text\" class=\"form-control\" name=\"username\" id=\"username\" placeholder=\"User Name\"></p>\n          <p><input type=\"password\" class=\"form-control\" name=\"passwd\" placeholder=\"Password\"></p>\n          <p>\n            <button type=\"submit\" class=\"btn btn-primary\">Sign in</button>\n            <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancel</button>\n          </p>\n        </form>\n      </div>\n    </div>\n\n  </div>\n</div>\n\n<div class=\"container-fluid\">\n  <div class=\"row\">\n    <div class=\"col-md-12\">\n      <h3 class=\"text-center text-primary\">The Comedy of Errors</h3>\n      \n      <p>Summary: <a href=\"https://en.wikipedia.org/wiki/The_Comedy_of_Errors\">Wikipedia Summary</a>: The Comedy of Errors is one of <b>William Shakespeare's</b> early plays. It is his shortest and one of his most farcical comedies, with a major part of the humour coming from slapstick and mistaken identity, in addition to puns and word play.</p>\n      \n    </div>\n  </div>\n\n  <div class=\"row\">\n    <div class=\"col-md-6\">\n      \n      <h4 class=\"text-center text-primary\">Book Details</h4>\n      <dl>\n        <dt>Type:</dt>paperback\n        <dt>Pages:</dt>200\n        <dt>Publisher:</dt>PublisherA\n        <dt>Language:</dt>English\n        <dt>ISBN-10:</dt>1234567890\n        <dt>ISBN-13:</dt>123-1234567890\n      </dl>\n      \n    </div>\n\n    <div class=\"col-md-6\">\n      \n      <h4 class=\"text-center text-primary\">Book Reviews</h4>\n      \n      <blockquote>\n        <p>An extremely entertaining play by Shakespeare. The slapstick humour is refreshing!</p>\n        <small>Reviewer1</small>\n        \n        \n        <font color=\"black\">\n          <!-- full stars: -->\n          \n          <span class=\"glyphicon glyphicon-star\"></span>\n          \n          <span class=\"glyphicon glyphicon-star\"></span>\n          \n          <span class=\"glyphicon glyphicon-star\"></span>\n          \n          <span class=\"glyphicon glyphicon-star\"></span>\n          \n          <span class=\"glyphicon glyphicon-star\"></span>\n          \n          <!-- empty stars: -->\n          \n        </font>\n        \n        \n      </blockquote>\n      \n      <blockquote>\n        <p>Absolutely fun and entertaining. The play lacks thematic depth when compared to other plays by Shakespeare.</p>\n        <small>Reviewer2</small>\n        \n        \n        <font color=\"black\">\n          <!-- full stars: -->\n          \n          <span class=\"glyphicon glyphicon-star\"></span>\n          \n          <span class=\"glyphicon glyphicon-star\"></span>\n          \n          <span class=\"glyphicon glyphicon-star\"></span>\n          \n          <span class=\"glyphicon glyphicon-star\"></span>\n          \n          <!-- empty stars: -->\n          \n          <span class=\"glyphicon glyphicon-star-empty\"></span>\n          \n        </font>\n        \n        \n      </blockquote>\n      \n      \n    </div>\n  </div>\n</div>\n\n\n    \n<!-- Latest compiled and minified JavaScript -->\n<script src=\"static/jquery.min.js\"></script>\n\n<!-- Latest compiled and minified JavaScript -->\n<script src=\"static/bootstrap/js/bootstrap.min.js\"></script>\n\n<script type=\"text/javascript\">\n  $('#login-modal').on('shown.bs.modal', function () {\n    $('#username').focus();\n  });\n</script>\n\n  </body>\n</html>\n",
+            "stderr": "*   Trying 134.209.155.202...\n* TCP_NODELAY set\n* Connected to 134.209.155.202 (134.209.155.202) port 30906 (#0)\n> GET /productpage HTTP/1.1\r\n> Host: 134.209.155.202:30906\r\n> User-Agent: curl/7.58.0\r\n> Accept: */*\r\n> Cookie: session=eyJ1c2VyIjoiamFzb24ifQ.XoIwZw.q7hCANguKLohEpkdWlPHnO_mYPs\r\n> \r\n< HTTP/1.1 200 OK\r\n< content-type: text/html; charset=utf-8\r\n< content-length: 5286\r\n< vary: Cookie\r\n< server: istio-envoy\r\n< date: Mon, 30 Mar 2020 17:46:15 GMT\r\n< x-envoy-upstream-service-time: 157\r\n< \r\n{ [5286 bytes data]\n* Connection #0 to host 134.209.155.202 left intact\n"
+          },
+          "status": "succeeded",
+          "start": "2020-03-30T17:46:15.470978",
+          "end": "2020-03-30T17:46:15.645977",
+          "duration": 0.174999,
+          "tolerance_met": true
+        }
+      ]
+    },
+    "after": {
+      "steady_state_met": false,
+      "probes": [
+        {
+          "activity": {
+            "type": "probe",
+            "name": "sign-in-as-jason",
+            "tolerance": 0,
+            "provider": {
+              "type": "process",
+              "path": "curl",
+              "arguments": "-v -X POST -d 'username=jason&passwd=' -c /tmp/cookie.txt --silent ${product_page_url}/login"
+            }
+          },
+          "output": {
+            "status": 0,
+            "stdout": "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n<title>Redirecting...</title>\n<h1>Redirecting...</h1>\n<p>You should be redirected automatically to target URL: <a href=\"\"></a>.  If not click the link.",
+            "stderr": "*   Trying 134.209.155.202...\n* TCP_NODELAY set\n* Connected to 134.209.155.202 (134.209.155.202) port 30906 (#0)\n> POST /login HTTP/1.1\r\n> Host: 134.209.155.202:30906\r\n> User-Agent: curl/7.58.0\r\n> Accept: */*\r\n> Content-Length: 22\r\n> Content-Type: application/x-www-form-urlencoded\r\n> \r\n} [22 bytes data]\n* upload completely sent off: 22 out of 22 bytes\n< HTTP/1.1 302 Found\r\n< content-type: text/html; charset=utf-8\r\n< content-length: 207\r\n< location: http://134.209.155.202:30906/None\r\n< vary: Cookie\r\n* cookie size: name/val 7 + 57 bytes\n* cookie size: name/val 8 + 0 bytes\n* cookie size: name/val 4 + 1 bytes\n* Added cookie session=\"eyJ1c2VyIjoiamFzb24ifQ.XoIwaQ.nFDhlKp5xDBGo6RPJBaTORdDy1I\" for domain 134.209.155.202, path /, expire 0\n< set-cookie: session=eyJ1c2VyIjoiamFzb24ifQ.XoIwaQ.nFDhlKp5xDBGo6RPJBaTORdDy1I; HttpOnly; Path=/\r\n< server: istio-envoy\r\n< date: Mon, 30 Mar 2020 17:46:17 GMT\r\n< x-envoy-upstream-service-time: 3\r\n< \r\n{ [207 bytes data]\n* Connection #0 to host 134.209.155.202 left intact\n"
+          },
+          "status": "succeeded",
+          "start": "2020-03-30T17:46:17.726742",
+          "end": "2020-03-30T17:46:17.749402",
+          "duration": 0.02266,
+          "tolerance_met": true
+        },
+        {
+          "activity": {
+            "type": "probe",
+            "name": "fetch-productpage-for-jason-in-due-time",
+            "tolerance": 0,
+            "provider": {
+              "type": "process",
+              "path": "curl",
+              "arguments": "-v --connect-timeout 1 --max-time 1 -b /tmp/cookie.txt --silent ${product_page_url}/productpage"
+            }
+          },
+          "output": {
+            "status": 28,
+            "stdout": "",
+            "stderr": "*   Trying 134.209.155.202...\n* TCP_NODELAY set\n* Connected to 134.209.155.202 (134.209.155.202) port 30906 (#0)\n> GET /productpage HTTP/1.1\r\n> Host: 134.209.155.202:30906\r\n> User-Agent: curl/7.58.0\r\n> Accept: */*\r\n> Cookie: session=eyJ1c2VyIjoiamFzb24ifQ.XoIwaQ.nFDhlKp5xDBGo6RPJBaTORdDy1I\r\n> \r\n* Operation timed out after 1001 milliseconds with 0 bytes received\n* stopped the pause stream!\n* Closing connection 0\n"
+          },
+          "status": "succeeded",
+          "start": "2020-03-30T17:46:17.749927",
+          "end": "2020-03-30T17:46:18.766736",
+          "duration": 1.016809,
+          "tolerance_met": false
+        }
+      ]
+    }
+  },
+  "run": [
+    {
+      "activity": {
+        "type": "action",
+        "name": "inject-fault-for-jason-only",
+        "provider": {
+          "type": "python",
+          "module": "chaosistio.fault.actions",
+          "func": "add_delay_fault",
+          "secrets": [
+            "istio"
+          ],
+          "arguments": {
+            "virtual_service_name": "reviews",
+            "fixed_delay": "5s",
+            "percent": 100,
+            "routes": [
+              {
+                "destination": {
+                  "host": "reviews",
+                  "subset": "v2"
+                }
+              }
+            ]
+          }
+        },
+        "pauses": {
+          "after": 2
+        }
+      },
+      "output": {
+        "status": 200,
+        "body": {
+          "apiVersion": "networking.istio.io/v1alpha3",
+          "kind": "VirtualService",
+          "metadata": {
+            "annotations": {
+              "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"networking.istio.io/v1alpha3\",\"kind\":\"VirtualService\",\"metadata\":{\"annotations\":{},\"name\":\"reviews\",\"namespace\":\"default\"},\"spec\":{\"hosts\":[\"reviews\"],\"http\":[{\"match\":[{\"headers\":{\"end-user\":{\"exact\":\"jason\"}}}],\"route\":[{\"destination\":{\"host\":\"reviews\",\"subset\":\"v2\"}}]},{\"route\":[{\"destination\":{\"host\":\"reviews\",\"subset\":\"v1\"}}]}]}}\n"
+            },
+            "creationTimestamp": "2020-03-30T17:32:01Z",
+            "generation": 3,
+            "managedFields": [
+              {
+                "apiVersion": "networking.istio.io/v1alpha3",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                  "f:metadata": {
+                    "f:annotations": {
+                      ".": {},
+                      "f:kubectl.kubernetes.io/last-applied-configuration": {}
+                    }
+                  },
+                  "f:spec": {
+                    ".": {},
+                    "f:hosts": {}
+                  }
+                },
+                "manager": "kubectl",
+                "operation": "Update",
+                "time": "2020-03-30T17:46:09Z"
+              },
+              {
+                "apiVersion": "networking.istio.io/v1alpha3",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                  "f:spec": {
+                    "f:http": {}
+                  }
+                },
+                "manager": "OpenAPI-Generator",
+                "operation": "Update",
+                "time": "2020-03-30T17:46:15Z"
+              }
+            ],
+            "name": "reviews",
+            "namespace": "default",
+            "resourceVersion": "900293",
+            "selfLink": "/apis/networking.istio.io/v1alpha3/namespaces/default/virtualservices/reviews",
+            "uid": "630f45a5-0aa2-4b9e-ad1e-50477c9465b7"
+          },
+          "spec": {
+            "hosts": [
+              "reviews"
+            ],
+            "http": [
+              {
+                "fault": {
+                  "delay": {
+                    "fixedDelay": "5s",
+                    "percent": 100
+                  }
+                },
+                "match": [
+                  {
+                    "headers": {
+                      "end-user": {
+                        "exact": "jason"
+                      }
+                    }
+                  }
+                ],
+                "route": [
+                  {
+                    "destination": {
+                      "host": "reviews",
+                      "subset": "v2"
+                    }
+                  }
+                ]
+              },
+              {
+                "route": [
+                  {
+                    "destination": {
+                      "host": "reviews",
+                      "subset": "v1"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Mon, 30 Mar 2020 17:46:15 GMT",
+          "Content-Length": "1579"
+        }
+      },
+      "status": "succeeded",
+      "start": "2020-03-30T17:46:15.646521",
+      "end": "2020-03-30T17:46:15.724616",
+      "duration": 0.078095
+    }
+  ],
+  "rollbacks": [
+    {
+      "activity": {
+        "type": "action",
+        "name": "remove-fault-for-jason-only",
+        "provider": {
+          "type": "python",
+          "module": "chaosistio.fault.actions",
+          "func": "remove_delay_fault",
+          "secrets": [
+            "istio"
+          ],
+          "arguments": {
+            "virtual_service_name": "reviews",
+            "routes": [
+              {
+                "destination": {
+                  "host": "reviews",
+                  "subset": "v2"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "output": {
+        "status": 200,
+        "body": {
+          "apiVersion": "networking.istio.io/v1alpha3",
+          "kind": "VirtualService",
+          "metadata": {
+            "annotations": {
+              "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"networking.istio.io/v1alpha3\",\"kind\":\"VirtualService\",\"metadata\":{\"annotations\":{},\"name\":\"reviews\",\"namespace\":\"default\"},\"spec\":{\"hosts\":[\"reviews\"],\"http\":[{\"match\":[{\"headers\":{\"end-user\":{\"exact\":\"jason\"}}}],\"route\":[{\"destination\":{\"host\":\"reviews\",\"subset\":\"v2\"}}]},{\"route\":[{\"destination\":{\"host\":\"reviews\",\"subset\":\"v1\"}}]}]}}\n"
+            },
+            "creationTimestamp": "2020-03-30T17:32:01Z",
+            "generation": 4,
+            "managedFields": [
+              {
+                "apiVersion": "networking.istio.io/v1alpha3",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                  "f:metadata": {
+                    "f:annotations": {
+                      ".": {},
+                      "f:kubectl.kubernetes.io/last-applied-configuration": {}
+                    }
+                  },
+                  "f:spec": {
+                    ".": {},
+                    "f:hosts": {}
+                  }
+                },
+                "manager": "kubectl",
+                "operation": "Update",
+                "time": "2020-03-30T17:46:09Z"
+              },
+              {
+                "apiVersion": "networking.istio.io/v1alpha3",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                  "f:spec": {
+                    "f:http": {}
+                  }
+                },
+                "manager": "OpenAPI-Generator",
+                "operation": "Update",
+                "time": "2020-03-30T17:46:18Z"
+              }
+            ],
+            "name": "reviews",
+            "namespace": "default",
+            "resourceVersion": "900301",
+            "selfLink": "/apis/networking.istio.io/v1alpha3/namespaces/default/virtualservices/reviews",
+            "uid": "630f45a5-0aa2-4b9e-ad1e-50477c9465b7"
+          },
+          "spec": {
+            "hosts": [
+              "reviews"
+            ],
+            "http": [
+              {
+                "match": [
+                  {
+                    "headers": {
+                      "end-user": {
+                        "exact": "jason"
+                      }
+                    }
+                  }
+                ],
+                "route": [
+                  {
+                    "destination": {
+                      "host": "reviews",
+                      "subset": "v2"
+                    }
+                  }
+                ]
+              },
+              {
+                "route": [
+                  {
+                    "destination": {
+                      "host": "reviews",
+                      "subset": "v1"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json",
+          "Date": "Mon, 30 Mar 2020 17:46:18 GMT",
+          "Content-Length": "1527"
+        }
+      },
+      "status": "succeeded",
+      "start": "2020-03-30T17:46:18.767545",
+      "end": "2020-03-30T17:46:18.826484",
+      "duration": 0.058939
+    }
+  ],
+  "end": "2020-03-30T17:46:18.826746",
+  "duration": 3.4331185817718506
+}

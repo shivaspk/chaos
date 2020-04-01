@@ -1,0 +1,116 @@
+[36m[2020-03-28 07:37:39 DEBUG] [cli:70][39m ###############################################################################
+[36m[2020-03-28 07:37:39 DEBUG] [cli:71][39m Running command 'run'
+[36m[2020-03-28 07:37:39 DEBUG] [cli:75][39m Using settings file '/root/.chaostoolkit/settings.yaml'
+[36m[2020-03-28 07:37:40 DEBUG] [settings:24][39m The Chaos Toolkit settings file could not be found at '/root/.chaostoolkit/settings.yaml'.
+[36m[2020-03-28 07:37:40 DEBUG] [__init__:355][39m No controls to apply on 'loader'
+[36m[2020-03-28 07:37:40 DEBUG] [__init__:355][39m No controls to apply on 'loader'
+[36m[2020-03-28 07:37:40 DEBUG] [caching:25][39m Building activity cache...
+[36m[2020-03-28 07:37:40 DEBUG] [caching:35][39m Cached 2 activities
+[32m[2020-03-28 07:37:40 INFO] [experiment:54][39m Validating the experiment's syntax
+[36m[2020-03-28 07:37:40 DEBUG] [configuration:47][39m Loading configuration...
+[36m[2020-03-28 07:37:40 DEBUG] [secret:74][39m Loading secrets...
+[36m[2020-03-28 07:37:40 DEBUG] [secret:89][39m Secrets loaded
+[32m[2020-03-28 07:37:41 INFO] [experiment:103][39m Experiment looks valid
+[36m[2020-03-28 07:37:41 DEBUG] [caching:42][39m Clearing activities cache
+[36m[2020-03-28 07:37:41 DEBUG] [caching:25][39m Building activity cache...
+[36m[2020-03-28 07:37:41 DEBUG] [caching:35][39m Cached 2 activities
+[32m[2020-03-28 07:37:41 INFO] [experiment:182][39m Running experiment: My application is resilient to pod death
+[36m[2020-03-28 07:37:41 DEBUG] [configuration:47][39m Loading configuration...
+[36m[2020-03-28 07:37:41 DEBUG] [secret:74][39m Loading secrets...
+[36m[2020-03-28 07:37:41 DEBUG] [secret:89][39m Secrets loaded
+[36m[2020-03-28 07:37:41 DEBUG] [__init__:39][39m Initializing controls
+[36m[2020-03-28 07:37:41 DEBUG] [__init__:355][39m No controls to apply on 'experiment'
+[32m[2020-03-28 07:37:41 INFO] [hypothesis:184][39m Steady state hypothesis: Application is normal
+[36m[2020-03-28 07:37:41 DEBUG] [__init__:355][39m No controls to apply on 'hypothesis'
+[36m[2020-03-28 07:37:41 DEBUG] [__init__:355][39m No controls to apply on 'activity'
+[32m[2020-03-28 07:37:41 INFO] [activity:161][39m Probe: application-must-respond-normally
+[36m[2020-03-28 07:37:41 DEBUG] [activity:179][39m   => succeeded with '{'status': 200, 'headers': {'Content-Type': 'text/html;charset=utf-8', 'Server': 'CherryPy/17.0.0', 'Date': 'Sat, 28 Mar 2020 07:37:41 GMT', 'Content-Length': '44'}, 'body': 'Hello world from my-service-645fb8b4dc-xcqf5'}'
+[36m[2020-03-28 07:37:41 DEBUG] [__init__:355][39m No controls to apply on 'activity'
+[36m[2020-03-28 07:37:41 DEBUG] [hypothesis:212][39m allowed tolerance is 200
+[32m[2020-03-28 07:37:41 INFO] [hypothesis:222][39m Steady state hypothesis is met!
+[36m[2020-03-28 07:37:41 DEBUG] [__init__:355][39m No controls to apply on 'hypothesis'
+[36m[2020-03-28 07:37:41 DEBUG] [__init__:355][39m No controls to apply on 'method'
+[36m[2020-03-28 07:37:41 DEBUG] [__init__:355][39m No controls to apply on 'activity'
+[32m[2020-03-28 07:37:41 INFO] [activity:161][39m Action: terminate-pods
+[36m[2020-03-28 07:37:41 DEBUG] [python:36][39m Activity 'terminate-pods' loaded from '/root/chaoslabs/.venv/lib/python3.6/site-packages/chaosk8s/pod/actions.py'
+[36m[2020-03-28 07:37:41 DEBUG] [__init__:69][39m Using Kubernetes context: default
+[36m[2020-03-28 07:37:41 DEBUG] [actions:194][39m Found 3 pods labelled 'name=my-app' in ns chaos
+[36m[2020-03-28 07:37:41 DEBUG] [activity:181][39m   => succeeded without any result value
+[32m[2020-03-28 07:37:41 INFO] [activity:198][39m Pausing after activity for 2s...
+[36m[2020-03-28 07:37:43 DEBUG] [__init__:355][39m No controls to apply on 'activity'
+[36m[2020-03-28 07:37:43 DEBUG] [__init__:355][39m No controls to apply on 'method'
+[32m[2020-03-28 07:37:43 INFO] [hypothesis:184][39m Steady state hypothesis: Application is normal
+[36m[2020-03-28 07:37:43 DEBUG] [__init__:355][39m No controls to apply on 'hypothesis'
+[36m[2020-03-28 07:37:43 DEBUG] [__init__:355][39m No controls to apply on 'activity'
+[32m[2020-03-28 07:37:43 INFO] [activity:161][39m Probe: application-must-respond-normally
+[36m[2020-03-28 07:37:43 DEBUG] [activity:179][39m   => succeeded with '{'status': 200, 'headers': {'Content-Type': 'text/html;charset=utf-8', 'Server': 'CherryPy/17.0.0', 'Date': 'Sat, 28 Mar 2020 07:37:43 GMT', 'Content-Length': '44'}, 'body': 'Hello world from my-service-645fb8b4dc-xcqf5'}'
+[36m[2020-03-28 07:37:43 DEBUG] [__init__:355][39m No controls to apply on 'activity'
+[36m[2020-03-28 07:37:43 DEBUG] [hypothesis:212][39m allowed tolerance is 200
+[32m[2020-03-28 07:37:43 INFO] [hypothesis:222][39m Steady state hypothesis is met!
+[36m[2020-03-28 07:37:43 DEBUG] [__init__:355][39m No controls to apply on 'hypothesis'
+[32m[2020-03-28 07:37:43 INFO] [experiment:323][39m Let's rollback...
+[36m[2020-03-28 07:37:43 DEBUG] [__init__:355][39m No controls to apply on 'rollback'
+[32m[2020-03-28 07:37:43 INFO] [rollback:25][39m No declared rollbacks, let's move on.
+[36m[2020-03-28 07:37:43 DEBUG] [__init__:355][39m No controls to apply on 'rollback'
+[32m[2020-03-28 07:37:43 INFO] [experiment:273][39m Experiment ended with status: completed
+[36m[2020-03-28 07:37:43 DEBUG] [__init__:355][39m No controls to apply on 'experiment'
+[36m[2020-03-28 07:37:43 DEBUG] [__init__:72][39m Cleaning up controls
+[36m[2020-03-28 07:37:43 DEBUG] [caching:42][39m Clearing activities cache
+[36m[2020-03-28 07:39:19 DEBUG] [cli:70][39m ###############################################################################
+[36m[2020-03-28 07:39:19 DEBUG] [cli:71][39m Running command 'run'
+[36m[2020-03-28 07:39:19 DEBUG] [cli:75][39m Using settings file '/root/.chaostoolkit/settings.yaml'
+[36m[2020-03-28 07:39:19 DEBUG] [settings:24][39m The Chaos Toolkit settings file could not be found at '/root/.chaostoolkit/settings.yaml'.
+[36m[2020-03-28 07:39:19 DEBUG] [__init__:355][39m No controls to apply on 'loader'
+[36m[2020-03-28 07:39:19 DEBUG] [__init__:355][39m No controls to apply on 'loader'
+[36m[2020-03-28 07:39:19 DEBUG] [caching:25][39m Building activity cache...
+[36m[2020-03-28 07:39:19 DEBUG] [caching:35][39m Cached 2 activities
+[32m[2020-03-28 07:39:19 INFO] [experiment:54][39m Validating the experiment's syntax
+[36m[2020-03-28 07:39:19 DEBUG] [configuration:47][39m Loading configuration...
+[36m[2020-03-28 07:39:19 DEBUG] [secret:74][39m Loading secrets...
+[36m[2020-03-28 07:39:19 DEBUG] [secret:89][39m Secrets loaded
+[32m[2020-03-28 07:39:20 INFO] [experiment:103][39m Experiment looks valid
+[36m[2020-03-28 07:39:20 DEBUG] [caching:42][39m Clearing activities cache
+[36m[2020-03-28 07:39:20 DEBUG] [caching:25][39m Building activity cache...
+[36m[2020-03-28 07:39:20 DEBUG] [caching:35][39m Cached 2 activities
+[32m[2020-03-28 07:39:20 INFO] [experiment:182][39m Running experiment: My application is resilient to pod death
+[36m[2020-03-28 07:39:20 DEBUG] [configuration:47][39m Loading configuration...
+[36m[2020-03-28 07:39:20 DEBUG] [secret:74][39m Loading secrets...
+[36m[2020-03-28 07:39:20 DEBUG] [secret:89][39m Secrets loaded
+[36m[2020-03-28 07:39:20 DEBUG] [__init__:39][39m Initializing controls
+[36m[2020-03-28 07:39:20 DEBUG] [__init__:355][39m No controls to apply on 'experiment'
+[32m[2020-03-28 07:39:20 INFO] [hypothesis:184][39m Steady state hypothesis: Application is normal
+[36m[2020-03-28 07:39:20 DEBUG] [__init__:355][39m No controls to apply on 'hypothesis'
+[36m[2020-03-28 07:39:20 DEBUG] [__init__:355][39m No controls to apply on 'activity'
+[32m[2020-03-28 07:39:20 INFO] [activity:161][39m Probe: application-must-respond-normally
+[36m[2020-03-28 07:39:20 DEBUG] [activity:179][39m   => succeeded with '{'status': 200, 'headers': {'Content-Type': 'text/html;charset=utf-8', 'Server': 'CherryPy/17.0.0', 'Date': 'Sat, 28 Mar 2020 07:39:20 GMT', 'Content-Length': '44'}, 'body': 'Hello world from my-service-645fb8b4dc-rp6q9'}'
+[36m[2020-03-28 07:39:20 DEBUG] [__init__:355][39m No controls to apply on 'activity'
+[36m[2020-03-28 07:39:20 DEBUG] [hypothesis:212][39m allowed tolerance is 200
+[32m[2020-03-28 07:39:20 INFO] [hypothesis:222][39m Steady state hypothesis is met!
+[36m[2020-03-28 07:39:20 DEBUG] [__init__:355][39m No controls to apply on 'hypothesis'
+[36m[2020-03-28 07:39:20 DEBUG] [__init__:355][39m No controls to apply on 'method'
+[36m[2020-03-28 07:39:20 DEBUG] [__init__:355][39m No controls to apply on 'activity'
+[32m[2020-03-28 07:39:20 INFO] [activity:161][39m Action: terminate-pods
+[36m[2020-03-28 07:39:20 DEBUG] [python:36][39m Activity 'terminate-pods' loaded from '/root/chaoslabs/.venv/lib/python3.6/site-packages/chaosk8s/pod/actions.py'
+[36m[2020-03-28 07:39:20 DEBUG] [__init__:69][39m Using Kubernetes context: default
+[36m[2020-03-28 07:39:20 DEBUG] [actions:194][39m Found 3 pods labelled 'name=my-app' in ns chaos
+[36m[2020-03-28 07:39:20 DEBUG] [activity:181][39m   => succeeded without any result value
+[32m[2020-03-28 07:39:20 INFO] [activity:198][39m Pausing after activity for 2s...
+[36m[2020-03-28 07:39:22 DEBUG] [__init__:355][39m No controls to apply on 'activity'
+[36m[2020-03-28 07:39:22 DEBUG] [__init__:355][39m No controls to apply on 'method'
+[32m[2020-03-28 07:39:22 INFO] [hypothesis:184][39m Steady state hypothesis: Application is normal
+[36m[2020-03-28 07:39:22 DEBUG] [__init__:355][39m No controls to apply on 'hypothesis'
+[36m[2020-03-28 07:39:22 DEBUG] [__init__:355][39m No controls to apply on 'activity'
+[32m[2020-03-28 07:39:22 INFO] [activity:161][39m Probe: application-must-respond-normally
+[36m[2020-03-28 07:39:22 DEBUG] [activity:179][39m   => succeeded with '{'status': 200, 'headers': {'Content-Type': 'text/html;charset=utf-8', 'Server': 'CherryPy/17.0.0', 'Date': 'Sat, 28 Mar 2020 07:39:22 GMT', 'Content-Length': '44'}, 'body': 'Hello world from my-service-645fb8b4dc-xcqf5'}'
+[36m[2020-03-28 07:39:22 DEBUG] [__init__:355][39m No controls to apply on 'activity'
+[36m[2020-03-28 07:39:22 DEBUG] [hypothesis:212][39m allowed tolerance is 200
+[32m[2020-03-28 07:39:22 INFO] [hypothesis:222][39m Steady state hypothesis is met!
+[36m[2020-03-28 07:39:22 DEBUG] [__init__:355][39m No controls to apply on 'hypothesis'
+[32m[2020-03-28 07:39:22 INFO] [experiment:323][39m Let's rollback...
+[36m[2020-03-28 07:39:22 DEBUG] [__init__:355][39m No controls to apply on 'rollback'
+[32m[2020-03-28 07:39:22 INFO] [rollback:25][39m No declared rollbacks, let's move on.
+[36m[2020-03-28 07:39:22 DEBUG] [__init__:355][39m No controls to apply on 'rollback'
+[32m[2020-03-28 07:39:22 INFO] [experiment:273][39m Experiment ended with status: completed
+[36m[2020-03-28 07:39:22 DEBUG] [__init__:355][39m No controls to apply on 'experiment'
+[36m[2020-03-28 07:39:22 DEBUG] [__init__:72][39m Cleaning up controls
+[36m[2020-03-28 07:39:22 DEBUG] [caching:42][39m Clearing activities cache

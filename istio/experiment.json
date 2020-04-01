@@ -1,0 +1,95 @@
+{
+    "title": "Network latency does not impact our users",
+    "description": "Using Istio fault injection capability, let's explore how latency impacts a single user",
+    "configuration": {
+        "product_page_url": {
+            "type": "env",
+            "key": "PRODUCT_PAGE_SERVICE_BASE_URL"
+        }
+    },
+    "secrets": {
+        "istio": {
+            "KUBERNETES_CONTEXT": {
+                "type": "env",
+                "key": "KUBERNETES_CONTEXT"
+            }
+        }
+    },
+    "steady-state-hypothesis": {
+        "title": "Our service should respond under 1 second",
+        "probes": [
+            {
+                "type": "probe",
+                "name": "sign-in-as-jason",
+                "tolerance": 0,
+                "provider": {
+                    "type": "process",
+                    "path": "curl",
+                    "arguments": "-v -X POST -d 'username=jason&passwd=' -c /tmp/cookie.txt --silent ${product_page_url}/login"
+                }
+            },
+            {
+                "type": "probe",
+                "name": "fetch-productpage-for-jason-in-due-time",
+                "tolerance": 0,
+                "provider": {
+                    "type": "process",
+                    "path": "curl",
+                    "arguments": "-v --connect-timeout 1 --max-time 1 -b /tmp/cookie.txt --silent ${product_page_url}/productpage"
+                }
+            }
+        ]
+    },
+    "method": [
+        {
+            "type": "action",
+            "name": "inject-fault-for-jason-only",
+            "provider": {
+                "type": "python",
+                "module": "chaosistio.fault.actions",
+                "func": "add_delay_fault",
+                "secrets": ["istio"],
+                "arguments": {
+                    "virtual_service_name": "reviews",
+                    "fixed_delay": "5s",
+                    "percent": 100,
+                    "routes": [
+                        {
+                            "destination": {
+                                "host": "reviews",
+                                "subset": "v2"
+                            }
+                        }
+                    ]
+                }
+            },
+            "pauses": {
+                "after": 2
+            }
+        }
+    ],
+    "rollbacks": [
+        {
+            "type": "action",
+            "name": "remove-fault-for-jason-only",
+            "provider": {
+                "type": "python",
+                "module": "chaosistio.fault.actions",
+                "func": "remove_delay_fault",
+                "secrets": ["istio"],
+                "arguments": {
+                    "virtual_service_name": "reviews",
+                    "routes": [
+                        {
+                            "destination": {
+                                "host": "reviews",
+                                "subset": "v2"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
+
